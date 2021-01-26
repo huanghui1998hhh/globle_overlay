@@ -49,8 +49,26 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
-        body: Center(
-          child: Text('Running on: $_platformVersion\n'),
+        body: Column(
+          children: [
+            Container(
+              width: double.infinity,
+              height: 200,
+              child: Center(
+                child: Text('Running on: $_platformVersion\n'),
+              ),
+            ),
+            RaisedButton(
+                child: Text('开启浮窗'),
+                onPressed: () async {
+                  await GlobleOverlay.openOverlay();
+                }),
+            RaisedButton(
+                child: Text('关闭浮窗'),
+                onPressed: () async {
+                  await GlobleOverlay.closeOverlay();
+                }),
+          ],
         ),
       ),
     );
