@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="timerDeepFocusBackToTimer">回到計時器</string>
+    <string name="timerDeepFocusInProgressTips">任務進行中，請保持專注。</string>
+    <string name="timerDeepFocusAllowListTitle">需要使用其他Apps怎麼辦？</string>
+    <string name="timerDeepFocusAllowListDesc">你可以點擊計時頁面的「設置」（左上角齒輪）按鈕，打開「深度專注許可Apps名單」添加你想在專注時需要打開的應用。</string>
+</resources>

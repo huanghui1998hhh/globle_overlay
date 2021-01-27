@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="timerDeepFocusBackToTimer">Back to timer</string>
+    <string name="timerDeepFocusInProgressTips">Task\'s in-progress. Please keep focus.</string>
+    <string name="timerDeepFocusAllowListTitle">What if I need to use other apps?</string>
+    <string name="timerDeepFocusAllowListDesc">You can click the Settings button at the upper-left corner of the Timer page, open Deep Focus Allow List, and add the apps you want.</string>
+</resources>

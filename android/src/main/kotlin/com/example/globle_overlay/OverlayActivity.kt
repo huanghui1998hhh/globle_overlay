@@ -1,76 +1,36 @@
-package com.example.globle_overlay
+package com.example.globle_overlay.activity
 
 import android.app.Activity
 import android.app.AlertDialog
-import android.content.Context
+import android.os.Bundle
 import android.view.Gravity
 import android.widget.*
-import androidx.annotation.NonNull
+import com.example.globle_overlay.EasyFloat
+import com.example.globle_overlay.R
 import com.example.globle_overlay.enums.ShowPattern
 import com.example.globle_overlay.enums.SidePattern
 import com.example.globle_overlay.interfaces.OnInvokeView
 import com.example.globle_overlay.permission.PermissionUtils
+import com.example.globle_overlay.startActivity
 import com.example.globle_overlay.widget.RoundProgressBar
-import io.flutter.embedding.engine.plugins.FlutterPlugin
-import io.flutter.embedding.engine.plugins.activity.ActivityAware
-import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
-import io.flutter.plugin.common.MethodCall
+import io.flutter.embedding.engine.FlutterEngine
+import io.flutter.embedding.engine.dart.DartExecutor
 import io.flutter.plugin.common.MethodChannel
-import io.flutter.plugin.common.MethodChannel.MethodCallHandler
-import io.flutter.plugin.common.MethodChannel.Result
 
+class OverlayActivity: Activity() {
+    lateinit var flutterEngine: FlutterEngine
+    lateinit var channel: MethodChannel
 
-/** GlobleOverlayPlugin */
-class GlobleOverlayPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
-  /// The MethodChannel that will the communication between Flutter and native Android
-  ///
-  /// This local reference serves to register the plugin with the Flutter Engine and unregister it
-  /// when the Flutter Engine is detached from the Activity
-  private lateinit var channel : MethodChannel
-  private lateinit var context: Context
-  private lateinit var activity: Activity
-
-
-    override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-    context = flutterPluginBinding.applicationContext
-    channel = MethodChannel(flutterPluginBinding.binaryMessenger, "globle_overlay")
-    channel.setMethodCallHandler(this)
-  }
-
-    override fun onAttachedToActivity(binding: ActivityPluginBinding) {
-        activity = binding.activity;
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        flutterEngine = FlutterEngine(this)
+        flutterEngine.dartExecutor.executeDartEntrypoint(DartExecutor.DartEntrypoint.createDefault())
+        channel = MethodChannel(flutterEngine.dartExecutor, "com.example.globle_overlay")
     }
 
-    override fun onDetachedFromActivityForConfigChanges() {
-
-    }
-
-    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
-
-    }
-
-    override fun onDetachedFromActivity() {
-
-    }
-
-    override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
-    if (call.method == "getPlatformVersion") {
-      result.success("Android ${android.os.Build.VERSION.RELEASE}")
-    } else if(call.method == "openOverlay"){
-        checkPermission()
-    } else if(call.method == "closeOverlay"){
-        EasyFloat.dismissAppFloat()
-    } else {
-      result.notImplemented()
-    }
-  }
-
-  override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
-    channel.setMethodCallHandler(null)
-  }
 
     private fun showAppFloat() {
-        EasyFloat.with(context)
+        EasyFloat.with(this)
                 .setShowPattern(ShowPattern.ALL_TIME)
                 .setSidePattern(SidePattern.RESULT_SIDE)
                 .setGravity(Gravity.CENTER)
@@ -79,7 +39,7 @@ class GlobleOverlayPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                         EasyFloat.dismissAppFloat()
                     }
                     it.findViewById<TextView>(R.id.tvOpenMain).setOnClickListener {
-                        startActivity<GlobleOverlayPlugin>(context)
+                        startActivity<OverlayActivity>(this)
                     }
                     it.findViewById<CheckBox>(R.id.checkbox)
                             .setOnCheckedChangeListener { _, isChecked ->
@@ -120,22 +80,20 @@ class GlobleOverlayPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     }
 
     private fun toast(string: String = "onClick") =
-            Toast.makeText(context, string, Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, string, Toast.LENGTH_SHORT).show()
 
     private fun checkPermission() {
-        if (PermissionUtils.checkPermission(context)) {
-          showAppFloat()
+        if (PermissionUtils.checkPermission(this)) {
+            showAppFloat()
         } else {
-            AlertDialog.Builder(context)
+            AlertDialog.Builder(this)
                     .setMessage("使用浮窗功能，需要您授权悬浮窗权限。")
                     .setPositiveButton("去开启") { _, _ ->
-                     showAppFloat()
+                        showAppFloat()
                     }
                     .setNegativeButton("取消") { _, _ -> }
                     .show()
         }
     }
-
-
 
 }

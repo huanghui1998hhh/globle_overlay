@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="timerDeepFocusBackToTimer">回到计时器</string>
+    <string name="timerDeepFocusInProgressTips">任务进行中，请保持专注。</string>
+    <string name="timerDeepFocusAllowListTitle">需要使用其他应用怎么办？</string>
+    <string name="timerDeepFocusAllowListDesc">你可以点击计时页面的 「设置」 (左上角齿轮) 按钮，打开「深度专注许可应用名单」添加你想在专注时需要打开的应用。</string>
+</resources>
