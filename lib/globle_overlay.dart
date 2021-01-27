@@ -15,11 +15,15 @@ class GlobleOverlay {
     return version;
   }
 
-  static Future openOverlay() async {
-    await _channel.invokeMethod('openOverlay');
+  static Future<bool> openOverlay() async {
+    return await _channel.invokeMethod('openOverlay');
   }
 
-  static Future closeOverlay() async {
-    await _channel.invokeMethod('closeOverlay');
+  static Future<bool> closeOverlay() async {
+    return await _channel.invokeMethod('closeOverlay');
+  }
+
+  static Future<bool> checkPermission() async {
+    return await _channel.invokeMethod('checkPermission');
   }
 }

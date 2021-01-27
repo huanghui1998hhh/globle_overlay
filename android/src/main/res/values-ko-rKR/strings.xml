@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="timerDeepFocusBackToTimer">回到计时器</string>
-    <string name="timerDeepFocusInProgressTips">任务进行中，请保持专注。</string>
-    <string name="timerDeepFocusAllowListTitle">需要使用其他应用怎么办？</string>
-    <string name="timerDeepFocusAllowListDesc">你可以点击计时页面的 「设置」 (左上角齿轮) 按钮，打开「深度专注许可应用名单」添加你想在专注时需要打开的应用。</string>
+    <string name="timerDeepFocusBackToTimer">타이머로 돌아가기</string>
+    <string name="timerDeepFocusInProgressTips">작업이 진행 중임. 집중하세요.</string>
+    <string name="timerDeepFocusAllowListTitle">다른 앱을 사용해야 하는 경우 어떻게 하시겠습니까?</string>
+    <string name="timerDeepFocusAllowListDesc">당신은 타이머 페이지의 "설치"(좌측 상단 기어) 버튼을 클릭하여 "깊이 집중 허용 앱 명단"을 열 수 있습니다.</string>
 </resources>

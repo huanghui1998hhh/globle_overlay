@@ -1,16 +1,16 @@
+
 package com.example.globle_overlay
 
-import android.app.Activity
-import android.app.AlertDialog
+import android.app.*
 import android.content.Context
-import android.view.Gravity
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
+import android.util.Log
 import android.widget.*
 import androidx.annotation.NonNull
-import com.example.globle_overlay.enums.ShowPattern
-import com.example.globle_overlay.enums.SidePattern
-import com.example.globle_overlay.interfaces.OnInvokeView
-import com.example.globle_overlay.permission.PermissionUtils
-import com.example.globle_overlay.widget.RoundProgressBar
+import androidx.annotation.RequiresApi
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -22,120 +22,106 @@ import io.flutter.plugin.common.MethodChannel.Result
 
 /** GlobleOverlayPlugin */
 class GlobleOverlayPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
-  /// The MethodChannel that will the communication between Flutter and native Android
-  ///
-  /// This local reference serves to register the plugin with the Flutter Engine and unregister it
-  /// when the Flutter Engine is detached from the Activity
-  private lateinit var channel : MethodChannel
-  private lateinit var context: Context
-  private lateinit var activity: Activity
+    /// The MethodChannel that will the communication between Flutter and native Android
+    ///
+    /// This local reference serves to register the plugin with the Flutter Engine and unregister it
+    /// when the Flutter Engine is detached from the Activity
+    private lateinit var channel : MethodChannel
+    private lateinit var context: Context
+    private lateinit var activity: Activity
 
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-    context = flutterPluginBinding.applicationContext
-    channel = MethodChannel(flutterPluginBinding.binaryMessenger, "globle_overlay")
-    channel.setMethodCallHandler(this)
-  }
+        context = flutterPluginBinding.applicationContext
+        channel = MethodChannel(flutterPluginBinding.binaryMessenger, "globle_overlay")
+        channel.setMethodCallHandler(this)
+    }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
         activity = binding.activity;
     }
 
-    override fun onDetachedFromActivityForConfigChanges() {
+    override fun onDetachedFromActivityForConfigChanges() {}
 
-    }
+    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {}
 
-    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
+    override fun onDetachedFromActivity() {}
 
-    }
-
-    override fun onDetachedFromActivity() {
-
-    }
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
-    if (call.method == "getPlatformVersion") {
-      result.success("Android ${android.os.Build.VERSION.RELEASE}")
-    } else if(call.method == "openOverlay"){
-        checkPermission()
-    } else if(call.method == "closeOverlay"){
-        EasyFloat.dismissAppFloat()
-    } else {
-      result.notImplemented()
-    }
-  }
+        when (call.method) {
+            "getPlatformVersion" -> {
+                result.success("Android ${android.os.Build.VERSION.RELEASE}")
+            }
+            "openOverlay" -> {
+                result.success(true)
+                if (Overlay.isStarted) {
+                    return
+                }
+                val intent = Intent(context, Overlay::class.java)
+                context.startService(intent)
+            }
+            "closeOverlay" -> {
+                result.success(false)
+                val intent = Intent(context, Overlay::class.java)
+                context.stopService(intent)
+            }
+            "checkPermission" -> {
+                result.success(checkPermission())
 
-  override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
-    channel.setMethodCallHandler(null)
-  }
-
-    private fun showAppFloat() {
-        EasyFloat.with(context)
-                .setShowPattern(ShowPattern.ALL_TIME)
-                .setSidePattern(SidePattern.RESULT_SIDE)
-                .setGravity(Gravity.CENTER)
-                .setLayout(R.layout.float_app, OnInvokeView {
-                    it.findViewById<ImageView>(R.id.ivClose).setOnClickListener {
-                        EasyFloat.dismissAppFloat()
-                    }
-                    it.findViewById<TextView>(R.id.tvOpenMain).setOnClickListener {
-                        startActivity<GlobleOverlayPlugin>(context)
-                    }
-                    it.findViewById<CheckBox>(R.id.checkbox)
-                            .setOnCheckedChangeListener { _, isChecked ->
-                                EasyFloat.appFloatDragEnable(isChecked)
-                            }
-
-                    val progressBar = it.findViewById<RoundProgressBar>(R.id.roundProgressBar).apply {
-                        setProgress(66, "66")
-                        setOnClickListener { toast(getProgressStr()) }
-                    }
-                    it.findViewById<SeekBar>(R.id.seekBar)
-                            .setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-                                override fun onProgressChanged(
-                                        seekBar: SeekBar?, progress: Int, fromUser: Boolean
-                                ) = progressBar.setProgress(progress, progress.toString())
-
-                                override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-
-                                override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-                            })
-
-//                // 解决 ListView 拖拽滑动冲突
-//                it.findViewById<ListView>(R.id.lv_test).apply {
-//                    adapter = MyAdapter(
-//                        this@MainActivity,
-//                        arrayOf("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "...")
-//                    )
-//
-//                    // 监听 ListView 的触摸事件，手指触摸时关闭拖拽，手指离开重新开启拖拽
-//                    setOnTouchListener { _, event ->
-//                        logger.e("listView: ${event.action}")
-//                        EasyFloat.appFloatDragEnable(event?.action == MotionEvent.ACTION_UP)
-//                        false
-//                    }
-//                }
-                })
-                .show()
-    }
-
-    private fun toast(string: String = "onClick") =
-            Toast.makeText(context, string, Toast.LENGTH_SHORT).show()
-
-    private fun checkPermission() {
-        if (PermissionUtils.checkPermission(context)) {
-          showAppFloat()
-        } else {
-            AlertDialog.Builder(context)
-                    .setMessage("使用浮窗功能，需要您授权悬浮窗权限。")
-                    .setPositiveButton("去开启") { _, _ ->
-                     showAppFloat()
-                    }
-                    .setNegativeButton("取消") { _, _ -> }
-                    .show()
+            }
+            else -> {
+                result.notImplemented()
+            }
         }
     }
 
+    override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
+        channel.setMethodCallHandler(null)
+    }
 
+    private fun checkPermission(): Boolean {
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.Q) {
+         return true
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!Settings.canDrawOverlays(context)) {
+                val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                        Uri.parse("package:" + context!!.packageName))
+                if (activity == null) {
+                    if (context != null) {
+                        context!!.startActivity(intent)
+                        Toast.makeText(context, "Please grant, Can Draw Over Other Apps permission.", Toast.LENGTH_SHORT).show()
+                        Log.e(Constants.TAG, "Can't detect the permission change, as the activity is null")
+                    } else {
+                        Log.e(Constants.TAG, "'Can Draw Over Other Apps' permission is not granted")
+                        Toast.makeText(context, "Can Draw Over Other Apps permission is required. Please grant it from the app settings", Toast.LENGTH_LONG).show()
+                    }
+                } else {
+                    activity!!.startActivityForResult(intent, ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE)
+                }
+            } else {
+                return true
+            }
+        }
+        return false
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    private fun handleBubblesPermissionForAndroidQ(): Boolean {
+        val devOptions = Settings.Secure.getInt(context!!.contentResolver, Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, 0)
+        return if (devOptions == 1) {
+            Log.d(Constants.TAG, "Android bubbles are enabled")
+            true
+        } else {
+            Log.e(Constants.TAG, "System Alert Window will not work without enabling the android bubbles")
+            Toast.makeText(context, "Enable android bubbles in the developer options, for System Alert Window to work", Toast.LENGTH_LONG).show()
+            false
+        }
+    }
+
+    companion object{
+        var ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE = 1237
+    }
 
 }
+

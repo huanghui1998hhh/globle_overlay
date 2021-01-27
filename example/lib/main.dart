@@ -4,7 +4,8 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:globle_overlay/globle_overlay.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
 }
 
@@ -15,6 +16,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
+  bool _a;
 
   @override
   void initState() {
@@ -27,6 +29,7 @@ class _MyAppState extends State<MyApp> {
     String platformVersion;
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
+      await GlobleOverlay.checkPermission();
       platformVersion = await GlobleOverlay.platformVersion;
     } on PlatformException {
       platformVersion = 'Failed to get platform version.';
@@ -55,7 +58,7 @@ class _MyAppState extends State<MyApp> {
               width: double.infinity,
               height: 200,
               child: Center(
-                child: Text('Running on: $_platformVersion\n'),
+                child: Text('Running on: $_platformVersion  $_a'),
               ),
             ),
             RaisedButton(

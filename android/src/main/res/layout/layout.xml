@@ -3,4 +3,39 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="#000000"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp"
+            android:text="英语学习"
+            android:textColor="#FFFFFF"
+            android:textSize="28dp" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="60dp"
+            android:textColor="#99EBEBF5"
+            android:text="@string/timerDeepFocusInProgressTips" />
+
+        <Button
+            android:id="@+id/backButton"
+            android:layout_width="200dp"
+            android:layout_height="50dp"
+            android:background="@drawable/button_shape"
+            android:singleLine="false"
+            android:text="@string/timerDeepFocusBackToTimer"
+            android:textColor="#FFFFFFFF"
+            android:textSize="17dp" />
+
+    </LinearLayout>
 </LinearLayout>
