@@ -15,8 +15,11 @@ class GlobleOverlay {
     return version;
   }
 
-  static Future<bool> openOverlay() async {
-    return await _channel.invokeMethod('openOverlay');
+  static Future<bool> openOverlay({String argument}) async {
+    final Map<String, dynamic> params = <String, String>{
+      'argument': argument,
+    };
+    return await _channel.invokeMethod('openOverlay', params);
   }
 
   static Future<bool> closeOverlay() async {

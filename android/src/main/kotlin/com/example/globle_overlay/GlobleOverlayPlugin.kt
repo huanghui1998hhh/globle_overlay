@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import android.util.Log
+import android.view.WindowManager
 import android.widget.*
 import androidx.annotation.NonNull
 import androidx.annotation.RequiresApi
@@ -55,10 +56,8 @@ class GlobleOverlayPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
             }
             "openOverlay" -> {
                 result.success(true)
-                if (Overlay.isStarted) {
-                    return
-                }
                 val intent = Intent(context, Overlay::class.java)
+                intent.putExtra("argument",call.argument<Any>("argument") as String)
                 context.startService(intent)
             }
             "closeOverlay" -> {
@@ -68,7 +67,6 @@ class GlobleOverlayPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
             }
             "checkPermission" -> {
                 result.success(checkPermission())
-
             }
             else -> {
                 result.notImplemented()

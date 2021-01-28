@@ -64,7 +64,7 @@ class _MyAppState extends State<MyApp> {
             RaisedButton(
                 child: Text('开启浮窗'),
                 onPressed: () async {
-                  await GlobleOverlay.openOverlay();
+                  await GlobleOverlay.openOverlay(argument: "你好");
                 }),
             RaisedButton(
                 child: Text('关闭浮窗'),

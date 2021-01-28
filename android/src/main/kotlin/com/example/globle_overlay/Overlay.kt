@@ -1,50 +1,47 @@
 package com.example.globle_overlay
 
+import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.app.PendingIntent
 import android.app.Service
+import android.content.Context
 import android.content.Intent
-import android.graphics.Color
+import android.graphics.Paint
 import android.graphics.PixelFormat
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
-import android.view.Gravity
-import android.view.MotionEvent
-import android.view.View
+import android.view.*
 import android.view.View.OnTouchListener
-import android.view.WindowManager
 import android.widget.Button
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.annotation.Nullable
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatDelegate
 import java.util.*
 
+
 class Overlay : Service() {
+    var context: Context? = null
+
+    private var widget: LinearLayout? = null
     private var windowManager: WindowManager? = null
     private var layoutParams: WindowManager.LayoutParams? = null
-    private var button: Button? = null
 
     private val binder: IBinder = LocalBinder()
 
     private var startClickTime: Long = 0
 
+    private var argument: String? = null
+
+    @SuppressLint("ServiceCast")
     override fun onCreate() {
         super.onCreate()
-        isStarted = true
-        windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
-        layoutParams = WindowManager.LayoutParams()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            layoutParams!!.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
-        } else {
-            layoutParams!!.type = WindowManager.LayoutParams.TYPE_PHONE
-        }
-        layoutParams!!.format = PixelFormat.RGBA_8888
-        layoutParams!!.gravity = Gravity.LEFT or Gravity.TOP
-        layoutParams!!.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-        layoutParams!!.width = 500
-        layoutParams!!.height = 100
-        layoutParams!!.x = 300
-        layoutParams!!.y = 300
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
+        widget = LayoutInflater.from(this).inflate(R.layout.layout, null) as LinearLayout
     }
 
     @Nullable
@@ -56,17 +53,32 @@ class Overlay : Service() {
         return false
     }
 
+    override fun onRebind(intent: Intent?) {
+        super.onRebind(intent)
+    }
+
     override fun onDestroy() {
         try {
-            if (button != null) windowManager!!.removeView(button)
-            isStarted = false
+            if (widget != null) windowManager!!.removeView(widget)
         } catch (e: Exception) {
         }
 
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+        context = applicationContext
+        try {
+            val extras = intent.extras
+            if (extras != null) {
+                Log.i(Constants.TAG, extras.toString())
+                argument = extras.getString("argument")
+            } else {
+                Log.i(Constants.TAG, "No intent Extras")
+            }
+        } catch (e: Exception) {
+            Log.e(Constants.TAG, e.message)
+        }
         showFloatingWindow()
         return START_STICKY
     }
@@ -74,14 +86,38 @@ class Overlay : Service() {
     @RequiresApi(Build.VERSION_CODES.M)
     private fun showFloatingWindow() {
         try {
-            button = Button(applicationContext)
-            button!!.text = "Floating Window"
-            button!!.setBackgroundColor(Color.BLUE)
-            windowManager!!.addView(button, layoutParams)
-            //拖拽监听
-            button!!.setOnTouchListener(FloatingOnTouchListener())
-        }catch (e: Exception) {
-            Log.e("globle_overlay", "Exception: " + e.message)
+            layoutParams = WindowManager.LayoutParams(
+                    WindowManager.LayoutParams.MATCH_PARENT,
+                    WindowManager.LayoutParams.MATCH_PARENT,
+                    WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+                    WindowManager.LayoutParams.FLAG_FULLSCREEN or WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
+                    PixelFormat.TRANSLUCENT
+            )
+//            layoutParams!!.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+//                    or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+//                    or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+//                    or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+//                    or View.SYSTEM_UI_FLAG_FULLSCREEN
+//                    or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
+
+//            activity?.actionBar?.hide()
+
+            widget?.findViewById<TextView>(R.id.textView)?.text = argument
+            widget?.findViewById<Button>(R.id.backButton)?.setOnClickListener {
+                startAppIntent(packageName)
+                if (widget != null) windowManager!!.removeView(widget)
+            }
+            widget?.findViewById<TextView>(R.id.textView3)?.setOnClickListener {
+                showDialog()
+            }
+            widget?.findViewById<TextView>(R.id.textView3)?.paint?.flags = Paint. UNDERLINE_TEXT_FLAG;
+            widget?.findViewById<ImageView>(R.id.imageView)?.setImageResource(R.drawable.ic_heart_break_icon);
+            widget?.findViewById<ImageView>(R.id.imageView2)?.setImageResource(R.drawable.ic_todomato_icon);
+            windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
+            windowManager!!.addView(widget, layoutParams)
+//            widget?.setOnTouchListener(FloatingOnTouchListener())
+        }catch (e: Exception){
+            Log.e(Constants.TAG, "Exception: " + e.message)
         }
     }
 
@@ -96,7 +132,7 @@ class Overlay : Service() {
                     y = event.rawY.toInt()
                     startClickTime = Calendar.getInstance().timeInMillis
                 }
-                MotionEvent.ACTION_UP ->{
+                MotionEvent.ACTION_UP -> {
                     val clickDuration = Calendar.getInstance().timeInMillis - startClickTime
                     if (clickDuration < Constants.MAX_CLICK_DURATION) {
                         startAppIntent(packageName)
@@ -131,13 +167,20 @@ class Overlay : Service() {
         }
     }
 
-    companion object {
-        var isStarted = false
-    }
-
     inner class LocalBinder : Binder() {
         val service: Overlay
             get() = this@Overlay
+    }
+
+    private fun showDialog() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle(R.string.timerDeepFocusAllowListTitle)
+        builder.setMessage(R.string.timerDeepFocusAllowListDesc)
+        builder.setPositiveButton(R.string.actionOK) { _, _ ->  }
+        val alertDialog = builder.create()
+        alertDialog.window!!.setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
+        alertDialog.setCanceledOnTouchOutside(true)
+        alertDialog.show()
     }
 }
 

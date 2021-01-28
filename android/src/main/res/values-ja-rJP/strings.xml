@@ -4,4 +4,5 @@
     <string name="timerDeepFocusInProgressTips">タスク進行中、集中してください。</string>
     <string name="timerDeepFocusAllowListTitle">ほかのアプリを使いたい場合は。</string>
     <string name="timerDeepFocusAllowListDesc">タイミングで「設定」(左上)をタップし、「『ディープフォーカス』モードで使えるアプリ」を開き、アプリを管理することが可能です。</string>
+    <string name="actionOK">オッケー</string>
 </resources>

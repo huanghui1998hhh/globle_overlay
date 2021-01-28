@@ -4,4 +4,5 @@
     <string name="timerDeepFocusInProgressTips">작업이 진행 중임. 집중하세요.</string>
     <string name="timerDeepFocusAllowListTitle">다른 앱을 사용해야 하는 경우 어떻게 하시겠습니까?</string>
     <string name="timerDeepFocusAllowListDesc">당신은 타이머 페이지의 "설치"(좌측 상단 기어) 버튼을 클릭하여 "깊이 집중 허용 앱 명단"을 열 수 있습니다.</string>
+    <string name="actionOK">오케이</string>
 </resources>
