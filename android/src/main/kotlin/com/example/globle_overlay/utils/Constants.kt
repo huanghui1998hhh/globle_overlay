@@ -1,4 +1,4 @@
-package com.example.globle_overlay
+package com.example.globle_overlay.utils
 
 object Constants {
     const val PACKAGE = "com.example.globle_overlay"

@@ -19,34 +19,50 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingTop="40dp"
-        android:paddingBottom="10dp"
+        android:paddingTop="80px"
+        android:paddingBottom="20px"
         android:text="计时任务"
         android:textColor="#FFFFFF"
-        android:textSize="28dp" />
+        android:textSize="28sp" />
 
     <TextView
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingBottom="60dp"
+        android:paddingBottom="120px"
         android:textColor="#99EBEBF5"
-        android:textSize="15dp"
+        android:textSize="15sp"
         android:text="@string/timerDeepFocusInProgressTips" />
 
-    <Button
-        android:id="@+id/backButton"
-        android:layout_width="200dp"
-        android:layout_height="50dp"
-        android:background="@drawable/button_shape"
-        android:singleLine="false"
-        android:text="@string/timerDeepFocusBackToTimer"
-        android:textColor="#FFFFFFFF"
-        android:textSize="17dp" />
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/buttonBackground"
+            android:layout_width="386px"
+            android:layout_height="6px"
+            android:layout_marginLeft="7px"
+            android:layout_marginRight="7px"
+            android:layout_marginBottom="2px"
+            android:layout_gravity="bottom|left"
+            android:background="@drawable/button_background_shape"
+            android:singleLine="false" />
+
+        <Button
+            android:id="@+id/backButton"
+            android:layout_width="400px"
+            android:layout_height="100px"
+            android:background="@drawable/button_shape"
+            android:singleLine="false"
+            android:text="@string/timerDeepFocusBackToTimer"
+            android:textColor="#FFFFFFFF"
+            android:textSize="17sp" />
+    </FrameLayout>
 
     <ImageView
         android:id="@+id/imageView2"
-        android:paddingTop="170dp"
+        android:paddingTop="340px"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:srcCompat="@drawable/ic_todomato_icon" />
@@ -56,8 +72,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:autoLink="all"
-        android:paddingTop="20dp"
+        android:paddingTop="40px"
         android:text="@string/timerDeepFocusAllowListTitle"
         android:textColor="#99EBEBF5"
-        android:textSize="13dp" />
+        android:textSize="13sp" />
 </LinearLayout>

@@ -1,5 +1,6 @@
 package com.example.globle_overlay
 
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.PendingIntent
@@ -21,6 +22,7 @@ import android.widget.TextView
 import androidx.annotation.Nullable
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatDelegate
+import com.example.globle_overlay.utils.Constants
 import java.util.*
 
 
@@ -115,6 +117,13 @@ class Overlay : Service() {
             widget?.findViewById<ImageView>(R.id.imageView2)?.setImageResource(R.drawable.ic_todomato_icon);
             windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
             windowManager!!.addView(widget, layoutParams)
+
+            val valueAnimator = ValueAnimator.ofInt(386, 0).setDuration(15000)
+            valueAnimator.addUpdateListener { animation ->
+                widget?.findViewById<Button>(R.id.buttonBackground)?.layoutParams?.width = animation.animatedValue as Int
+                widget?.findViewById<Button>(R.id.buttonBackground)?.requestLayout()
+            }
+            valueAnimator.start()
 //            widget?.setOnTouchListener(FloatingOnTouchListener())
         }catch (e: Exception){
             Log.e(Constants.TAG, "Exception: " + e.message)

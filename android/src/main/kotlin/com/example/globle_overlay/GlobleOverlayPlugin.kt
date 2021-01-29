@@ -8,10 +8,10 @@ import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import android.util.Log
-import android.view.WindowManager
 import android.widget.*
 import androidx.annotation.NonNull
 import androidx.annotation.RequiresApi
+import com.example.globle_overlay.utils.Constants
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
