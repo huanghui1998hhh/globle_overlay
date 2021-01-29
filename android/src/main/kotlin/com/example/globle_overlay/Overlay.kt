@@ -22,6 +22,8 @@ import android.widget.TextView
 import androidx.annotation.Nullable
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.example.globle_overlay.utils.Constants
 import java.util.*
 
@@ -91,7 +93,7 @@ class Overlay : Service() {
             layoutParams = WindowManager.LayoutParams(
                     WindowManager.LayoutParams.MATCH_PARENT,
                     WindowManager.LayoutParams.MATCH_PARENT,
-                    WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY else WindowManager.LayoutParams.TYPE_PHONE,
                     WindowManager.LayoutParams.FLAG_FULLSCREEN or WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
                     PixelFormat.TRANSLUCENT
             )
@@ -116,9 +118,11 @@ class Overlay : Service() {
             widget?.findViewById<ImageView>(R.id.imageView)?.setImageResource(R.drawable.ic_heart_break_icon);
             widget?.findViewById<ImageView>(R.id.imageView2)?.setImageResource(R.drawable.ic_todomato_icon);
             windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
+            val controller = widget?.let { ViewCompat.getWindowInsetsController(it) }
+            controller?.hide(WindowInsetsCompat.Type.statusBars())
             windowManager!!.addView(widget, layoutParams)
 
-            val valueAnimator = ValueAnimator.ofInt(386, 0).setDuration(15000)
+            val valueAnimator = ValueAnimator.ofInt(0, 386).setDuration(15000)
             valueAnimator.addUpdateListener { animation ->
                 widget?.findViewById<Button>(R.id.buttonBackground)?.layoutParams?.width = animation.animatedValue as Int
                 widget?.findViewById<Button>(R.id.buttonBackground)?.requestLayout()
@@ -187,7 +191,7 @@ class Overlay : Service() {
         builder.setMessage(R.string.timerDeepFocusAllowListDesc)
         builder.setPositiveButton(R.string.actionOK) { _, _ ->  }
         val alertDialog = builder.create()
-        alertDialog.window!!.setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
+        alertDialog.window!!.setType(if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY else WindowManager.LayoutParams.TYPE_PHONE)
         alertDialog.setCanceledOnTouchOutside(true)
         alertDialog.show()
     }

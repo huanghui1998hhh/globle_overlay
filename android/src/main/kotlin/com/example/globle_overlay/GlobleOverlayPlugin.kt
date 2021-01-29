@@ -48,7 +48,6 @@ class GlobleOverlayPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
     override fun onDetachedFromActivity() {}
 
-
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         when (call.method) {
             "getPlatformVersion" -> {
@@ -79,9 +78,7 @@ class GlobleOverlayPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     }
 
     private fun checkPermission(): Boolean {
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.Q) {
-         return true
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!Settings.canDrawOverlays(context)) {
                 val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                         Uri.parse("package:" + context!!.packageName))
