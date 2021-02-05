@@ -29,4 +29,46 @@ class GlobleOverlay {
   static Future<bool> checkPermission() async {
     return await _channel.invokeMethod('checkPermission');
   }
+
+  static Future<List> get appList async {
+    final List _appList = await _channel.invokeMethod('appCheck');
+    return _appList;
+  }
+
+  static Future openAppWithPackageName(String packageName) async {
+    await _channel.invokeMethod('openAppWithPackageName', packageName);
+  }
+
+  static Future<String> get topApp async {
+    final String _topApp = await _channel.invokeMethod('getTopApp');
+    return _topApp;
+  }
+
+  static Future checkAppPermission() async {
+    await _channel.invokeMethod('checkAppPermission');
+  }
+
+  static Future<bool> startListen(List<String> _whiteList) async {
+    return await _channel.invokeMethod('startListen', _whiteList);
+  }
+
+  static Future<bool> endListen() async {
+    return await _channel.invokeMethod('endListen');
+  }
+
+  static void callbacks(Function callbackOn, Function callbackOff) {
+    // ignore: missing_return
+    _channel.setMethodCallHandler((call) {
+      switch (call.method) {
+        case "callbackOn":
+          callbackOn();
+          break;
+        case "callbackOff":
+          callbackOff();
+          break;
+        default:
+          return null;
+      }
+    });
+  }
 }

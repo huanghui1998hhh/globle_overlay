@@ -29,7 +29,7 @@ class _MyAppState extends State<MyApp> {
     String platformVersion;
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
-      await GlobleOverlay.checkPermission();
+      await GlobleOverlay.checkAppPermission();
       platformVersion = await GlobleOverlay.platformVersion;
     } on PlatformException {
       platformVersion = 'Failed to get platform version.';
@@ -61,6 +61,11 @@ class _MyAppState extends State<MyApp> {
                 child: Text('Running on: $_platformVersion  $_a'),
               ),
             ),
+            RaisedButton(onPressed: () async {
+              await Future.delayed(Duration(seconds: 3), () async {
+                print(await GlobleOverlay.topApp);
+              });
+            }),
             RaisedButton(
                 child: Text('开启浮窗'),
                 onPressed: () async {
@@ -70,6 +75,30 @@ class _MyAppState extends State<MyApp> {
                 child: Text('关闭浮窗'),
                 onPressed: () async {
                   await GlobleOverlay.closeOverlay();
+                }),
+            RaisedButton(
+                child: Text('开启浮窗权限'),
+                onPressed: () async {
+                  await GlobleOverlay.checkPermission();
+                }),
+            RaisedButton(
+                child: Text('开启权限'),
+                onPressed: () async {
+                  await GlobleOverlay.checkAppPermission();
+                }),
+            RaisedButton(
+                child: Text('开始监听'),
+                onPressed: () async {
+                  await GlobleOverlay.startListen([
+                    'gg.op.lol.android',
+                    'com.miui.home',
+                    'com.miui.securitycenter'
+                  ]);
+                }),
+            RaisedButton(
+                child: Text('关闭监听'),
+                onPressed: () async {
+                  await GlobleOverlay.endListen();
                 }),
           ],
         ),

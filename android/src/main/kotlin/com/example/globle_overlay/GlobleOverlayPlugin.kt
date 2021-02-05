@@ -48,6 +48,7 @@ class GlobleOverlayPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
     override fun onDetachedFromActivity() {}
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         when (call.method) {
             "getPlatformVersion" -> {
@@ -67,6 +68,27 @@ class GlobleOverlayPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
             "checkPermission" -> {
                 result.success(checkPermission())
             }
+            "openAppWithPackageName" -> {
+                startAppIntent(call.arguments<String>())
+            }
+            "getTopApp" -> {
+                result.success(RunningTaskUtil(context).getTopRunningTasks()?.packageName)
+            }
+            "checkAppPermission" -> {
+                result.success(checkAppPermission())
+            }
+            "startListen" -> {
+                Log.i("TAG","开始111")
+                result.success(true)
+                val intent = Intent(context, ListenerService::class.java)
+                intent.putExtra("argument", call.arguments as ArrayList<*>)
+                context.startService(intent)
+            }
+            "endListen" -> {
+                result.success(false)
+                val intent = Intent(context, ListenerService::class.java)
+                context.stopService(intent)
+            }
             else -> {
                 result.notImplemented()
             }
@@ -78,27 +100,44 @@ class GlobleOverlayPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     }
 
     private fun checkPermission(): Boolean {
+        Log.i("TAG","正在获取浮窗权限")
        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!Settings.canDrawOverlays(context)) {
                 val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                         Uri.parse("package:" + context!!.packageName))
-                if (activity == null) {
-                    if (context != null) {
-                        context!!.startActivity(intent)
-                        Toast.makeText(context, "Please grant, Can Draw Over Other Apps permission.", Toast.LENGTH_SHORT).show()
-                        Log.e(Constants.TAG, "Can't detect the permission change, as the activity is null")
-                    } else {
-                        Log.e(Constants.TAG, "'Can Draw Over Other Apps' permission is not granted")
-                        Toast.makeText(context, "Can Draw Over Other Apps permission is required. Please grant it from the app settings", Toast.LENGTH_LONG).show()
-                    }
-                } else {
-                    activity!!.startActivityForResult(intent, ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE)
-                }
+                activity.startActivityForResult(intent, ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE)
             } else {
                 return true
             }
         }
         return false
+    }
+
+    private fun checkAppPermission(): Boolean {
+        Log.i("TAG","正在获取使用情况权限")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!Settings.canDrawOverlays(context)) {
+                val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
+                    intent.data = Uri.fromParts("package", context.packageName, null)
+                }
+                activity.startActivityForResult(intent, MY_PERMISSIONS_REQUEST_PACKAGE_USAGE_STATS)
+            } else {
+                return true
+            }
+        }
+        return false
+    }
+
+    private fun startAppIntent(packageName: String?) {
+        val intent = context.packageManager.getLaunchIntentForPackage(packageName!!)
+        intent!!.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        val pendingIntent = PendingIntent.getActivity(context.applicationContext, 0, intent, 0)
+        try {
+            pendingIntent.send()
+        } catch(e: PendingIntent.CanceledException) {
+            e.printStackTrace()
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
@@ -116,6 +155,7 @@ class GlobleOverlayPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
     companion object{
         var ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE = 1237
+        var MY_PERMISSIONS_REQUEST_PACKAGE_USAGE_STATS = 1101
     }
 
 }

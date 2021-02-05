@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="com.example.globle_overlay">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.example.globle_overlay">
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" tools:ignore="ProtectedPermissions" />
 
     <application>
         <service
@@ -10,6 +12,12 @@
             android:enabled="true"
             android:exported="true"
             android:permission="android.permission.FOREGROUND_SERVICE">
+        </service>
+
+        <service
+            android:name=".ListenerService"
+            android:enabled="true"
+            android:exported="true">
         </service>
     </application>
 </manifest>

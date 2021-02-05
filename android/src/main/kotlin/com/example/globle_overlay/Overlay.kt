@@ -64,6 +64,7 @@ class Overlay : Service() {
     override fun onDestroy() {
         try {
             if (widget != null) windowManager!!.removeView(widget)
+            flag = false
         } catch (e: Exception) {
         }
 
@@ -83,7 +84,9 @@ class Overlay : Service() {
         } catch (e: Exception) {
             Log.e(Constants.TAG, e.message)
         }
-        showFloatingWindow()
+        if(!flag){
+            showFloatingWindow()
+        }
         return START_STICKY
     }
 
@@ -121,6 +124,8 @@ class Overlay : Service() {
             val controller = widget?.let { ViewCompat.getWindowInsetsController(it) }
             controller?.hide(WindowInsetsCompat.Type.statusBars())
             windowManager!!.addView(widget, layoutParams)
+
+            flag = true
 
             val valueAnimator = ValueAnimator.ofInt(0, 386).setDuration(15000)
             valueAnimator.addUpdateListener { animation ->
@@ -170,6 +175,7 @@ class Overlay : Service() {
     }
 
     private fun startAppIntent(packageName: String?) {
+        flag = false
         val intent = packageManager.getLaunchIntentForPackage(packageName!!)
         intent!!.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         val pendingIntent = PendingIntent.getActivity(applicationContext, 0, intent, 0)
@@ -194,6 +200,11 @@ class Overlay : Service() {
         alertDialog.window!!.setType(if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY else WindowManager.LayoutParams.TYPE_PHONE)
         alertDialog.setCanceledOnTouchOutside(true)
         alertDialog.show()
+    }
+
+    companion object {
+        private const val TAG = "Overlay"
+        private var flag = false
     }
 }
 
