@@ -1,21 +1,21 @@
- package com.example.globle_overlay
+package com.example.globle_overlay
 
 import android.annotation.SuppressLint
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.*
 import android.util.Log
 import androidx.annotation.RequiresApi
-import io.flutter.embedding.engine.FlutterEngine
-import io.flutter.embedding.engine.dart.DartExecutor
-import io.flutter.plugin.common.MethodChannel
-
 
 class ListenerService : Service() {
-  private var argument: ArrayList<String>? = ArrayList()
+  lateinit var whiteListSp :SharedPreferences
+  lateinit var argument: MutableSet<String>
   lateinit var handler: Handler
-  var context: Context? = null
+  lateinit var context: Context
+
+  lateinit var taskName: String
 
   private val binder: IBinder = LocalBinder()
 
@@ -26,6 +26,10 @@ class ListenerService : Service() {
     handler = Handler(Looper.getMainLooper())
 
     context = applicationContext
+
+    whiteListSp = context.getSharedPreferences("whiteList",Context.MODE_PRIVATE)
+
+    Log.i("TAG","onCreateD")
   }
 
   @SuppressLint("HandlerLeak")
@@ -33,14 +37,15 @@ class ListenerService : Service() {
     try {
       val extras = intent.extras
       if (extras != null) {
-        argument?.clear()
-        argument?.add(applicationContext.packageName)
-        extras.getStringArrayList("argument")?.let { argument?.addAll(it) }
-        Log.i(TAG, argument.toString())
-      } else {
-        Log.i(TAG, "没有参数")
+        extras.getString("taskName")?.let { taskName = it }
       }
     } catch(e: Exception) {}
+
+    Log.i("TAG","onStartCommand")
+    argument = whiteListSp.getStringSet("whiteList", setOf(context.packageName)) as MutableSet<String>
+    argument.add(context.packageName)
+
+    Log.i("TAG",argument.toString())
 
     flag = true
 
@@ -50,29 +55,17 @@ class ListenerService : Service() {
         super.run()
         while(flag) {
           synchronized(ListenerService::class.java) {
-            var topApp =  RunningTaskUtil(applicationContext).getTopRunningTasks()?.packageName
+            val topApp =  RunningTaskUtil(applicationContext).getTopRunningTasks()?.packageName
+            val mIntent = Intent(context, Overlay::class.java)
             Log.i("TAG",topApp.toString())
-            if(argument!=null){
-              var bingoFlag = true
-              for(item in argument!!){
-                if(topApp==item){
-                  handler.post {
-                    val intent = Intent(context, Overlay::class.java)
-                    context?.stopService(intent)
-                  }
-                  bingoFlag = false
-                  break
-                }
+            if(argument.contains(topApp)){
+              handler.post {
+                context.stopService(mIntent)
               }
-              if(bingoFlag){
-//                var message = Message()
-//                message.what = 1
-//                handler.sendMessage(message)
-                handler.post {
-                  val intent = Intent(context, Overlay::class.java)
-                  intent.putExtra("argument","你好")
-                  context?.startService(intent)
-                }
+            }else{
+              handler.post {
+                mIntent.putExtra("argument",taskName)
+                context.startService(mIntent)
               }
             }
             SystemClock.sleep(500)

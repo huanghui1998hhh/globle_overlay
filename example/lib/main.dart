@@ -89,11 +89,7 @@ class _MyAppState extends State<MyApp> {
             RaisedButton(
                 child: Text('开始监听'),
                 onPressed: () async {
-                  await GlobleOverlay.startListen([
-                    'gg.op.lol.android',
-                    'com.miui.home',
-                    'com.miui.securitycenter'
-                  ]);
+                  await GlobleOverlay.startListen("你好");
                 }),
             RaisedButton(
                 child: Text('关闭监听'),

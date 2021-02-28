@@ -81,7 +81,7 @@ class GlobleOverlayPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
                 Log.i("TAG","开始111")
                 result.success(true)
                 val intent = Intent(context, ListenerService::class.java)
-                intent.putExtra("argument", call.arguments as ArrayList<*>)
+                intent.putExtra("argument", call.arguments as String)
                 context.startService(intent)
             }
             "endListen" -> {
@@ -102,13 +102,13 @@ class GlobleOverlayPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     private fun checkPermission(): Boolean {
         Log.i("TAG","正在获取浮窗权限")
        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (!Settings.canDrawOverlays(context)) {
+//            if (!Settings.canDrawOverlays(context)) {
                 val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                         Uri.parse("package:" + context!!.packageName))
                 activity.startActivityForResult(intent, ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE)
-            } else {
-                return true
-            }
+//            } else {
+//                return true
+//            }
         }
         return false
     }
@@ -116,15 +116,15 @@ class GlobleOverlayPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     private fun checkAppPermission(): Boolean {
         Log.i("TAG","正在获取使用情况权限")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (!Settings.canDrawOverlays(context)) {
+//            if (!Settings.canDrawOverlays(context)) {
                 val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
                     intent.data = Uri.fromParts("package", context.packageName, null)
                 }
                 activity.startActivityForResult(intent, MY_PERMISSIONS_REQUEST_PACKAGE_USAGE_STATS)
-            } else {
-                return true
-            }
+//            } else {
+//                return true
+//            }
         }
         return false
     }

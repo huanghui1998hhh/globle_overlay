@@ -48,8 +48,8 @@ class GlobleOverlay {
     await _channel.invokeMethod('checkAppPermission');
   }
 
-  static Future<bool> startListen(List<String> _whiteList) async {
-    return await _channel.invokeMethod('startListen', _whiteList);
+  static Future<bool> startListen(String taskName) async {
+    return await _channel.invokeMethod('startListen', taskName);
   }
 
   static Future<bool> endListen() async {
